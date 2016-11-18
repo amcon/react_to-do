@@ -15,6 +15,34 @@ export default class App extends React.Component {
     this.state = {
       tasks: {},
     };
+
+    this.addTask = this.addTask.bind(this);
+  }
+
+  addTask(name, desc){
+    // post to DB this name and description
+    // .then update the state
+
+    fetch('/tasks', {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify({name, desc})
+    })
+      .then(r => r.json())
+      .then(newTask => {
+
+        const newState = {...this.state.tasks};
+        newState[newTask.id] = newTask;
+        this.setState({
+          tasks: newState
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
+    console.log(arguments);
   }
 
   render() {
@@ -26,23 +54,31 @@ export default class App extends React.Component {
         <main className="container">
           <section className="jumbotron">
             <h1>Task Manager</h1>
-            <TaskForm />
+            <TaskForm
+              addTask={this.addTask}
+            />
           </section>
           {/* to do lists */}
           <section className="row">
             <article className="col-md-4">
               <h3>Open Items</h3>
-              <TaskList />
+              <TaskList
+                collection={this.state.tasks}
+               />
             </article>
 
             <article className="col-md-4">
               <h3>Completed Items</h3>
-              <TaskList />
+              <TaskList
+                collection={this.state.tasks}
+              />
             </article>
 
             <article className="col-md-4">
               <h3>Deleted Items</h3>
-              <TaskList />
+              <TaskList
+                collection={this.state.tasks}
+              />
             </article>
           </section>
         </main>
